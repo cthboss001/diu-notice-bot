@@ -13,8 +13,9 @@ LIST_URL = "https://webbackend.daffodilvarsity.edu.bd/registrar-office/all-forms
 BASE_URL = "https://webbackend.daffodilvarsity.edu.bd"
 STATE_FILE = Path("last_notice.json")
 
-BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
-CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
+BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"].strip()
+CHAT_ID = os.environ["TELEGRAM_CHAT_ID"].strip()
+
 
 
 def fetch_html(url: str) -> str:
