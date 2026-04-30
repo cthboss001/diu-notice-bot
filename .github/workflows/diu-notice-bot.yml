@@ -1,0 +1,39 @@
+name: DIU Notice Bot
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run notice bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python diu_notice_bot.py
+
+      - name: Save latest notice ID
+        run: |
+          git config user.name "cthboss001"
+          git config user.email "tazimhossen001@gmail.com"
+          git add last_notice.json
+          git diff --cached --quiet || git commit -m "Update latest notice id"
+          git push
