@@ -169,7 +169,8 @@ def build_message(notice: dict) -> str:
     content = html.escape(notice["content"])
     url = html.escape(notice["url"])
 
-    return f"<b>{title}</b>\n\n{content}\n\n<a href=\"{url}\">Open notice</a>"
+    return f"<b>DIU Registrar Notice</b>\n\n<b>{title}</b>\n\n{content}\n\n<a href=\"{url}\">Open notice</a>"
+
 
 
 def main() -> None:
