@@ -13,10 +13,8 @@ LIST_URL = "https://webbackend.daffodilvarsity.edu.bd/department-notice/cse"
 BASE_URL = "https://webbackend.daffodilvarsity.edu.bd"
 STATE_FILE = Path("last_notice_cse.json")
 
-
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"].strip()
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"].strip()
-
 
 
 def fetch_html(url: str) -> str:
@@ -59,7 +57,7 @@ def get_latest_notice() -> dict:
                 "url": url,
             }
 
-    raise RuntimeError("Could not find latest notice link.")
+    raise RuntimeError("Could not find latest CSE notice link.")
 
 
 def get_notice_detail(notice: dict) -> dict:
@@ -70,13 +68,20 @@ def get_notice_detail(notice: dict) -> dict:
 
     title = notice["title"]
 
-    date_index = None
+    start_index = None
+
     for i, line in enumerate(lines):
-        if line.lower().startswith("date:"):
-            date_index = i
+        if "Notice Detail" in line:
+            start_index = i + 1
             break
 
-    if date_index is None:
+    if start_index is None:
+        for i, line in enumerate(lines):
+            if line == title:
+                start_index = i + 1
+                break
+
+    if start_index is None:
         raise RuntimeError("Could not find notice content.")
 
     stop_words = {
@@ -91,11 +96,17 @@ def get_notice_detail(notice: dict) -> dict:
 
     content_lines = []
 
-    for line in lines[date_index:]:
+    for line in lines[start_index:]:
         if line in stop_words:
             break
 
         if line == title:
+            continue
+
+        if line.lower() == "cse":
+            continue
+
+        if "Notice Detail" in line:
             continue
 
         content_lines.append(line)
@@ -173,13 +184,12 @@ def build_message(notice: dict) -> str:
     return f"<b>DIU CSE Notice</b>\n\n<b>{title}</b>\n\n{content}\n\n<a href=\"{url}\">Open notice</a>"
 
 
-
 def main() -> None:
     latest = get_latest_notice()
     last_id = load_last_notice_id()
 
     if latest["id"] == last_id:
-        print(f"No new notice. Latest notice id: {latest['id']}")
+        print(f"No new CSE notice. Latest notice id: {latest['id']}")
         return
 
     notice = get_notice_detail(latest)
@@ -188,7 +198,7 @@ def main() -> None:
     send_telegram_message(message)
     save_last_notice_id(notice["id"])
 
-    print(f"Sent notice: {notice['title']}")
+    print(f"Sent CSE notice: {notice['title']}")
 
 
 if __name__ == "__main__":
