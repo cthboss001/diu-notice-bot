@@ -69,13 +69,13 @@ def get_notice_detail(notice: dict) -> dict:
 
     title = notice["title"]
 
-    date_index = None
+    start_index = None
     for i, line in enumerate(lines):
-        if line.lower().startswith("date:"):
-            date_index = i
+        if line.strip().lower() == "notice" or line.lower().startswith("date:"):
+            start_index = i
             break
 
-    if date_index is None:
+    if start_index is None:
         raise RuntimeError("Could not find notice content.")
 
     stop_words = {
@@ -90,11 +90,15 @@ def get_notice_detail(notice: dict) -> dict:
 
     content_lines = []
 
-    for line in lines[date_index:]:
+    for line in lines[start_index:]:
         if line in stop_words:
             break
 
         if line == title:
+            continue
+
+        # Skip the footer's truncated repeat of the title, e.g. "Notice on ...(B..."
+        if line.endswith("...") and title.startswith(line[:-3]):
             continue
 
         content_lines.append(line)
