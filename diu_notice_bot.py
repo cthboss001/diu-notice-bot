@@ -71,9 +71,21 @@ def get_notice_detail(notice: dict) -> dict:
 
     start_index = None
     for i, line in enumerate(lines):
-        if line.strip().lower() == "notice" or line.lower().startswith("date:"):
-            start_index = i
+        if "Notice Detail" in line:
+            start_index = i + 1
             break
+
+    if start_index is None:
+        for i, line in enumerate(lines):
+            if line.strip().lower() == "notice" or line.lower().startswith("date:"):
+                start_index = i
+                break
+
+    if start_index is None:
+        for i, line in enumerate(lines):
+            if line == title:
+                start_index = i + 1
+                break
 
     if start_index is None:
         raise RuntimeError("Could not find notice content.")
