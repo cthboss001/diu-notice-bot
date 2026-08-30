@@ -84,7 +84,7 @@ diu-notice-bot/
 
 - Monitors DIU Registrar Office and CSE Department notice boards
 - Sends formatted notices directly to a Telegram channel
-- Supports **private Telegram channels** via numeric chat ID
+- Supports both **private** (numeric chat ID) and **public** (`@channel_username`) Telegram channels
 - Prevents duplicate messages using persistent JSON state files
 - Runs fully headless — no browser, no display, no Selenium
 - Triggered automatically via cron schedule or manually via `workflow_dispatch`
@@ -107,10 +107,10 @@ cd diu-notice-bot
 2. Send `/newbot` and follow the prompts
 3. Copy your **Bot Token**
 4. Add the bot to your channel as an **Administrator**
-5. Get your **Chat ID** (for private channels, it starts with `-100`)
-
-> **Private channels:** Always use the numeric chat ID (e.g., `-1001234567890`).  
-> Do **not** use `@channel_username` for private channels — it will not work.
+5. Set your `TELEGRAM_CHAT_ID`:
+   - **Private channel:** numeric chat ID (e.g., `-1001234567890`)
+   - **Public channel:** channel username (e.g., `@my_channel`)
+   - **Also accepted:** channel link (e.g., `https://t.me/my_channel`)
 
 ### 3. Add GitHub Secrets
 
@@ -119,7 +119,7 @@ Go to your repository → **Settings** → **Secrets and variables** → **Actio
 | Secret Name | Value |
 |---|---|
 | `TELEGRAM_BOT_TOKEN` | Your bot token from BotFather |
-| `TELEGRAM_CHAT_ID` | Your channel's numeric chat ID |
+| `TELEGRAM_CHAT_ID` | Private numeric chat ID, public `@channel_username`, or `https://t.me/channel` link |
 
 ### 4. Install Dependencies (for local testing)
 
