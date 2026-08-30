@@ -3,7 +3,7 @@ import json
 import os
 import re
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -14,7 +14,35 @@ BASE_URL = "https://webbackend.daffodilvarsity.edu.bd"
 STATE_FILE = Path("last_notice.json")
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"].strip()
-CHAT_ID = os.environ["TELEGRAM_CHAT_ID"].strip()
+
+
+def normalize_chat_id(raw_chat_id: str) -> str:
+    chat_id = raw_chat_id.strip()
+    if not chat_id:
+        raise ValueError("TELEGRAM_CHAT_ID cannot be empty.")
+
+    if chat_id.startswith(("http://", "https://")):
+        parsed = urlparse(chat_id)
+        if parsed.netloc.lower() in {"t.me", "www.t.me", "telegram.me", "www.telegram.me"}:
+            path = parsed.path.strip("/")
+            if path:
+                chat_id = path.split("/")[0]
+
+    if chat_id.lstrip("-").isdigit():
+        return chat_id
+
+    username = chat_id[1:] if chat_id.startswith("@") else chat_id
+    username = username.strip()
+
+    if not re.fullmatch(r"[A-Za-z0-9_]{5,}", username):
+        raise ValueError(
+            "TELEGRAM_CHAT_ID must be a numeric chat ID, a valid @channel_username, or a t.me channel link."
+        )
+
+    return f"@{username}"
+
+
+CHAT_ID = normalize_chat_id(os.environ["TELEGRAM_CHAT_ID"])
 
 
 
